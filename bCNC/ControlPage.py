@@ -915,7 +915,7 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
         frame.pack(side=TOP, fill=X)
 
         row, col = 0, 0
-        Label(frame, text=_("Z")).grid(row=row, column=col)
+        # Label(frame, text=_("Z")).grid(row=row, column=col)
 
         col += 3
         Label(frame, text=_("Y")).grid(row=row, column=col)
@@ -924,8 +924,8 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
         row += 1
         col = 0
 
-        width = 3
-        height = 2
+        width = 2
+        height = 1
 
         b = Button(
             frame,
@@ -935,9 +935,9 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
             height=height,
             activebackground="LightYellow",
         )
-        b.grid(row=row, column=col, sticky=EW)
-        tkExtra.Balloon.set(b, _("Move +Z"))
-        self.addWidget(b)
+        # b.grid(row=row, column=col, sticky=EW)
+        # tkExtra.Balloon.set(b, _("Move +Z"))
+        # self.addWidget(b)
 
         col += 2
         b = Button(
@@ -1074,6 +1074,9 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
             self.zstep.fill(zsl)
             tkExtra.Balloon.set(self.zstep, _("Step for Z move operation"))
             self.addWidget(self.zstep)
+            # === Fitur tambahan untuk memperbaiki Z yang tidak diperlukan ===
+            self.zstep = self.step 
+            # =================================================
         except Exception:
             self.zstep = self.step
 
@@ -1105,10 +1108,10 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
             height=height,
             activebackground="LightYellow",
         )
-        b.grid(row=row, column=col, sticky=EW)
-        tkExtra.Balloon.set(b, _("Move -Z"))
-        self.addWidget(b)
-
+        # b.grid(row=row, column=col, sticky=EW)
+        # tkExtra.Balloon.set(b, _("Move -Z"))
+        # self.addWidget(b)
+ 
         col += 2
         b = Button(
             frame,
@@ -2074,7 +2077,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             row=row, column=col, rowspan=2, columnspan=4, sticky=EW)
         tkExtra.Balloon.set(
             self.overrideScale,
-            _("Set Feed/Rapid/Spindle Override. "
+            _("Set Feed/Rapid/Laser Override. "
               + "Right or Double click to reset."),
         )
 
@@ -2085,8 +2088,8 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
         col = 0
         b = Checkbutton(
             f,
-            text=_("Spindle"),
-            image=Utils.icons["spinningtop"],
+            text=_("Laser  "),
+            image=Utils.icons["laser3"],
             command=self.spindleControl,
             compound=LEFT,
             indicatoron=False,
@@ -2094,7 +2097,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             padx=1,
             pady=0,
         )
-        tkExtra.Balloon.set(b, _("Start/Stop spindle (M3/M5)"))
+        tkExtra.Balloon.set(b, _("Start/Stop laser (M3/M5)"))
         b.grid(row=row, column=col, pady=0, sticky=NSEW)
         self.addWidget(b)
 
@@ -2105,10 +2108,12 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             command=self.spindleControl,
             showvalue=True,
             orient=HORIZONTAL,
-            from_=Utils.config.get("CNC", "spindlemin"),
-            to_=Utils.config.get("CNC", "spindlemax"),
+            # from_=Utils.config.get("CNC", "spindlemin"),
+            from_=0,
+            # to_=Utils.config.get("CNC", "spindlemax"),
+            to_=100,
         )
-        tkExtra.Balloon.set(b, _("Set spindle RPM"))
+        tkExtra.Balloon.set(b, _("Set Laser Power"))
         b.grid(row=row, column=col, sticky=EW, columnspan=3)
         self.addWidget(b)
 
@@ -2116,56 +2121,56 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
 
         # Coolant control
 
-        self.coolant = BooleanVar()
-        self.mist = BooleanVar()
-        self.flood = BooleanVar()
+        # self.coolant = BooleanVar()
+        # self.mist = BooleanVar()
+        # self.flood = BooleanVar()
 
-        row += 1
-        col = 0
-        Label(f, text=_("Coolant:")).grid(row=row, column=col, sticky=E)
-        col += 1
+        # row += 1
+        # col = 0
+        # Label(f, text=_("Coolant:")).grid(row=row, column=col, sticky=E)
+        # col += 1
 
-        coolantDisable = Checkbutton(
-            f,
-            text=_("OFF"),
-            command=self.coolantOff,
-            indicatoron=False,
-            variable=self.coolant,
-            padx=1,
-            pady=0,
-        )
-        tkExtra.Balloon.set(coolantDisable, _("Stop cooling (M9)"))
-        coolantDisable.grid(row=row, column=col, pady=0, sticky=NSEW)
-        self.addWidget(coolantDisable)
+        # coolantDisable = Checkbutton(
+        #     f,
+        #     text=_("OFF"),
+        #     command=self.coolantOff,
+        #     indicatoron=False,
+        #     variable=self.coolant,
+        #     padx=1,
+        #     pady=0,
+        # )
+        # tkExtra.Balloon.set(coolantDisable, _("Stop cooling (M9)"))
+        # coolantDisable.grid(row=row, column=col, pady=0, sticky=NSEW)
+        # self.addWidget(coolantDisable)
 
-        col += 1
-        floodEnable = Checkbutton(
-            f,
-            text=_("Flood"),
-            command=self.coolantFlood,
-            indicatoron=False,
-            variable=self.flood,
-            padx=1,
-            pady=0,
-        )
-        tkExtra.Balloon.set(floodEnable, _("Start flood (M8)"))
-        floodEnable.grid(row=row, column=col, pady=0, sticky=NSEW)
-        self.addWidget(floodEnable)
+        # col += 1
+        # floodEnable = Checkbutton(
+        #     f,
+        #     text=_("Flood"),
+        #     command=self.coolantFlood,
+        #     indicatoron=False,
+        #     variable=self.flood,
+        #     padx=1,
+        #     pady=0,
+        # )
+        # tkExtra.Balloon.set(floodEnable, _("Start flood (M8)"))
+        # floodEnable.grid(row=row, column=col, pady=0, sticky=NSEW)
+        # self.addWidget(floodEnable)
 
-        col += 1
-        mistEnable = Checkbutton(
-            f,
-            text=_("Mist"),
-            command=self.coolantMist,
-            indicatoron=False,
-            variable=self.mist,
-            padx=1,
-            pady=0,
-        )
-        tkExtra.Balloon.set(mistEnable, _("Start mist (M7)"))
-        mistEnable.grid(row=row, column=col, pady=0, sticky=NSEW)
-        self.addWidget(mistEnable)
-        f.grid_columnconfigure(1, weight=1)
+        # col += 1
+        # mistEnable = Checkbutton(
+        #     f,
+        #     text=_("Mist"),
+        #     command=self.coolantMist,
+        #     indicatoron=False,
+        #     variable=self.mist,
+        #     padx=1,
+        #     pady=0,
+        # )
+        # tkExtra.Balloon.set(mistEnable, _("Start mist (M7)"))
+        # mistEnable.grid(row=row, column=col, pady=0, sticky=NSEW)
+        # self.addWidget(mistEnable)
+        # f.grid_columnconfigure(1, weight=1)
 
     # ----------------------------------------------------------------------
     def overrideChange(self, event=None):
@@ -2225,7 +2230,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             return
         try:
             feed = float(self.feedRate.get())
-            self.sendGCode(f"F{feed:g}")
+            self.sendGCode(f"G1 F{feed:g}")
             self.event_generate("<<CanvasFocus>>")
         except ValueError:
             pass
@@ -2252,9 +2257,12 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
         if CNC.vars["state"] in (Sender.CONNECTED, Sender.NOT_CONNECTED):
             return
         if self.spindle.get():
-            self.sendGCode("M3 S%d" % (self.spindleSpeed.get()))
+            # REVISI KODE --------------------------------------
+            speed = self.spindleSpeed.get()
+            self.sendGCode("G1 F100 M3 S%d" % (speed))
         else:
             self.sendGCode("M5")
+            self.sendGCode("G0")
 
     # ----------------------------------------------------------------------
     def coolantMist(self, event=None):
@@ -2303,7 +2311,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             self.feedRate.set(str(CNC.vars["feed"]))
             self.feedMode.set(FEED_MODE[CNC.vars["feedmode"]])
             self.spindle.set(CNC.vars["spindle"] == "M3")
-            self.spindleSpeed.set(int(CNC.vars["rpm"]))
+            self.spindleSpeed.set(int(CNC.vars["Watt"]))
             self.toolEntry.set(CNC.vars["tool"])
             self.units.set(UNITS[CNC.vars["units"]])
             self.distance.set(DISTANCE_MODE[CNC.vars["distance"]])

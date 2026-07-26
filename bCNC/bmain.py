@@ -150,7 +150,7 @@ class Application(Tk, Sender):
         tkinter.CallWrapper = Utils.CallWrapper
         tkExtra.bindClasses(self)
 
-        photo = PhotoImage(file=f"{Utils.prgpath}/bCNC.png")
+        photo = PhotoImage(file=f"{Utils.prgpath}/gchad.png")
         self.iconphoto(True, photo)
         self.title(f"{Utils.__prg__} {__version__} {__platform_fingerprint__}")
         self.widgets = []
@@ -242,11 +242,11 @@ class Application(Tk, Sender):
         self.pages = {}
         for cls in (
             ControlPage,
-            EditorPage,
+            # EditorPage,
             FilePage,
-            ProbePage,
+            # ProbePage,
             TerminalPage,
-            ToolsPage,
+            # ToolsPage,
         ):
             page = cls(self.ribbon, self)
             self.pages[page.name] = page
@@ -292,12 +292,22 @@ class Application(Tk, Sender):
         self.gstate = Page.frames["State"]
         self.control = Page.frames["Control"]
         self.abccontrol = Page.frames["abcControl"]
-        self.editor = Page.frames["Editor"].editor
+        # self.editor = Page.frames["Editor"].editor
         self.terminal = Page.frames["Terminal"].terminal
         self.buffer = Page.frames["Terminal"].buffer
 
+        # --- PERBAIKAN STRATEGIS: MOCK EDITOR LENGKAP UNTUK PROSES RUN ---
+        class MockEditor:
+            def isModified(self): return False
+            def fill(self): pass
+            def getSelectedBlocks(self): return []
+            def getSelection(self): return []  # <-- Tambahkan baris ini
+            def selectClear(self): pass
+        self.editor = MockEditor()
+        # -----------------------------------------------------------------
+
         # XXX FIXME Do we need it or I can takes from Page every time?
-        self.autolevel = Page.frames["Probe:Autolevel"]
+        # self.autolevel = Page.frames["Probe:Autolevel"]
 
         # Left side
         for name in Utils.getStr(Utils.__prg__, "ribbon").split():
@@ -307,24 +317,25 @@ class Application(Tk, Sender):
                 side = RIGHT
             else:
                 side = LEFT
-            self.ribbon.addPage(self.pages[name], side)
+            if name in self.pages:
+                self.ribbon.addPage(self.pages[name], side)
 
         # Restore last page
         # Select "Probe:Probe" tab to show the dialogs!
-        self.pages["Probe"].tabChange()
+        # self.pages["Probe"].tabChange()  # Lase doesnt use this!
         self.ribbon.changePage(Utils.getStr(Utils.__prg__, "page", "File"))
 
-        probe = Page.frames["Probe:Probe"]
-        tkExtra.bindEventData(
-            self, "<<OrientSelect>>", lambda e, f=probe: f.selectMarker(
-                int(e.data))
-        )
-        tkExtra.bindEventData(
-            self,
-            "<<OrientChange>>",
-            lambda e, s=self: s.canvas.orientChange(int(e.data)),
-        )
-        self.bind("<<OrientUpdate>>", probe.orientUpdate)
+        # probe = Page.frames["Probe:Probe"]
+        # tkExtra.bindEventData(
+        #     self, "<<OrientSelect>>", lambda e, f=probe: f.selectMarker(
+        #         int(e.data))
+        # )
+        # tkExtra.bindEventData(
+        #     self,
+        #     "<<OrientChange>>",
+        #     lambda e, s=self: s.canvas.orientChange(int(e.data)),
+        # )
+        # self.bind("<<OrientUpdate>>", probe.orientUpdate)
 
         # Global bindings
         self.bind("<<Undo>>", self.undo)
@@ -366,33 +377,33 @@ class Application(Tk, Sender):
         tkExtra.bindEventData(self, "<<Status>>", self.updateStatus)
         tkExtra.bindEventData(self, "<<Coords>>", self.updateCanvasCoords)
 
-        # Editor bindings
-        self.bind("<<Add>>", self.editor.insertItem)
-        self.bind("<<AddBlock>>", self.editor.insertBlock)
-        self.bind("<<AddLine>>", self.editor.insertLine)
-        self.bind("<<Clone>>", self.editor.clone)
-        self.canvas.bind("<Control-Key-Prior>", self.editor.orderUp)
-        self.canvas.bind("<Control-Key-Next>", self.editor.orderDown)
-        self.canvas.bind("<Control-Key-d>", self.editor.clone)
-        self.canvas.bind("<Control-Key-c>", self.copy)
-        self.canvas.bind("<Control-Key-x>", self.cut)
-        self.canvas.bind("<Control-Key-v>", self.paste)
-        self.bind("<<Delete>>", self.editor.deleteBlock)
-        self.canvas.bind("<Delete>", self.editor.deleteBlock)
-        self.canvas.bind("<BackSpace>", self.editor.deleteBlock)
-        try:
-            self.canvas.bind("<KP_Delete>", self.editor.deleteBlock)
-        except Exception:
-            pass
-        self.bind("<<Invert>>", self.editor.invertBlocks)
-        self.bind("<<Expand>>", self.editor.toggleExpand)
-        self.bind("<<EnableToggle>>", self.editor.toggleEnable)
-        self.bind("<<Enable>>", self.editor.enable)
-        self.bind("<<Disable>>", self.editor.disable)
-        self.bind("<<ChangeColor>>", self.editor.changeColor)
-        self.bind("<<Comment>>", self.editor.commentRow)
-        self.bind("<<Join>>", self.editor.joinBlocks)
-        self.bind("<<Split>>", self.editor.splitBlocks)
+        # # Editor bindings
+        # self.bind("<<Add>>", self.editor.insertItem)
+        # self.bind("<<AddBlock>>", self.editor.insertBlock)
+        # self.bind("<<AddLine>>", self.editor.insertLine)
+        # self.bind("<<Clone>>", self.editor.clone)
+        # self.canvas.bind("<Control-Key-Prior>", self.editor.orderUp)
+        # self.canvas.bind("<Control-Key-Next>", self.editor.orderDown)
+        # self.canvas.bind("<Control-Key-d>", self.editor.clone)
+        # self.canvas.bind("<Control-Key-c>", self.copy)
+        # self.canvas.bind("<Control-Key-x>", self.cut)
+        # self.canvas.bind("<Control-Key-v>", self.paste)
+        # self.bind("<<Delete>>", self.editor.deleteBlock)
+        # self.canvas.bind("<Delete>", self.editor.deleteBlock)
+        # self.canvas.bind("<BackSpace>", self.editor.deleteBlock)
+        # try:
+        #     self.canvas.bind("<KP_Delete>", self.editor.deleteBlock)
+        # except Exception:
+        #     pass
+        # self.bind("<<Invert>>", self.editor.invertBlocks)
+        # self.bind("<<Expand>>", self.editor.toggleExpand)
+        # self.bind("<<EnableToggle>>", self.editor.toggleEnable)
+        # self.bind("<<Enable>>", self.editor.enable)
+        # self.bind("<<Disable>>", self.editor.disable)
+        # self.bind("<<ChangeColor>>", self.editor.changeColor)
+        # self.bind("<<Comment>>", self.editor.commentRow)
+        # self.bind("<<Join>>", self.editor.joinBlocks)
+        # self.bind("<<Split>>", self.editor.splitBlocks)
 
         # Canvas X-bindings
         self.bind("<<ViewChange>>", self.viewChange)
@@ -400,15 +411,15 @@ class Application(Tk, Sender):
         self.bind("<<MoveGantry>>", self.canvas.setActionGantry)
         self.bind("<<SetWPOS>>", self.canvas.setActionWPOS)
 
-        frame = Page.frames["Probe:Tool"]
-        self.bind("<<ToolCalibrate>>", frame.calibrate)
-        self.bind("<<ToolChange>>", frame.change)
+        # frame = Page.frames["Probe:Tool"]
+        # self.bind("<<ToolCalibrate>>", frame.calibrate)
+        # self.bind("<<ToolChange>>", frame.change)
 
-        self.bind("<<AutolevelMargins>>", self.autolevel.getMargins)
-        self.bind("<<AutolevelZero>>", self.autolevel.setZero)
-        self.bind("<<AutolevelClear>>", self.autolevel.clear)
-        self.bind("<<AutolevelScan>>", self.autolevel.scan)
-        self.bind("<<AutolevelScanMargins>>", self.autolevel.scanMargins)
+        # self.bind("<<AutolevelMargins>>", self.autolevel.getMargins)
+        # self.bind("<<AutolevelZero>>", self.autolevel.setZero)
+        # self.bind("<<AutolevelClear>>", self.autolevel.clear)
+        # self.bind("<<AutolevelScan>>", self.autolevel.scan)
+        # self.bind("<<AutolevelScanMargins>>", self.autolevel.scanMargins)
 
         self.bind("<<CameraOn>>", self.canvas.cameraOn)
         self.bind("<<CameraOff>>", self.canvas.cameraOff)
@@ -432,10 +443,10 @@ class Application(Tk, Sender):
         self.bind("<<SelectInvert>>", self.selectInvert)
         self.bind("<<SelectLayer>>", self.selectLayer)
 
-        self.bind("<Control-Key-e>", self.editor.toggleExpand)
+        # self.bind("<Control-Key-e>", self.editor.toggleExpand)
         self.bind("<Control-Key-n>", self.showInfo)
         self.bind("<<ShowInfo>>", self.showInfo)
-        self.bind("<Control-Key-l>", self.editor.toggleEnable)
+        # self.bind("<Control-Key-l>", self.editor.toggleEnable)
         self.bind("<Control-Key-q>", self.quit)
         self.bind("<Control-Key-o>", self.loadDialog)
         self.bind("<Control-Key-r>", self.drawAfter)
@@ -447,11 +458,11 @@ class Application(Tk, Sender):
         self.bind("<Control-Key-space>", self.commandFocus)
         self.bind("<<CommandFocus>>", self.commandFocus)
 
-        tools = self.pages["CAM"]
-        self.bind("<<ToolAdd>>", tools.add)
-        self.bind("<<ToolDelete>>", tools.delete)
-        self.bind("<<ToolClone>>", tools.clone)
-        self.bind("<<ToolRename>>", tools.rename)
+        # tools = self.pages["CAM"]
+        # self.bind("<<ToolAdd>>", tools.add)
+        # self.bind("<<ToolDelete>>", tools.delete)
+        # self.bind("<<ToolClone>>", tools.clone)
+        # self.bind("<<ToolRename>>", tools.rename)
 
         self.bind("<Prior>", self.control.moveZup)
         self.bind("<Next>", self.control.moveZdown)
@@ -2258,6 +2269,9 @@ class Application(Tk, Sender):
     # Selection has changed highlight the canvas
     # ----------------------------------------------------------------------
     def selectionChange(self, event=None):
+        if not hasattr(self, 'editor') or self.editor is None:
+            return
+        
         items = self.editor.getSelection()
         self.canvas.clearSelection()
         if not items:
@@ -2379,12 +2393,39 @@ class Application(Tk, Sender):
             self.event_generate("<<OrientUpdate>>")
 
         else:
-            self.editor.selectClear()
-            self.editor.fill()
+            try:
+                self.editor.selectClear()
+            except AttributeError:
+                # Jika objek editor tidak ditemukan pada scope ini, bypass ke app utama
+                if hasattr(self, 'app') and hasattr(self.app, 'editor'):
+                    self.app.editor.selectClear()
+                else:
+                    pass
+            # Ubah bagian pemanggilan editor menjadi seperti ini:
+            if hasattr(self, 'editor') and not isinstance(self.editor, getattr(self, 'tk', object).__class__):
+                try:
+                    self.editor.selectClear()
+                except Exception:
+                    pass
+                try:
+                    self.editor.fill()
+                except Exception:
+                    pass
+            else:
+                # Jika memanggil tkinter tkapp, buat variabel pengalih aman ke objek bCNC editor yang asli
+                try:
+                    if hasattr(self, 'app') and hasattr(self.app, 'editor'):
+                        self.app.editor.selectClear()
+                        self.app.editor.fill()
+                except Exception:
+                    pass
             self.canvas.reset()
             self.draw()
             self.canvas.fit2Screen()
-            Page.frames["CAM"].populate()
+            try:
+                Page.frames["CAM"].populate()
+            except KeyError:
+                pass
 
         if autoloaded:
             self.setStatus(
@@ -2789,8 +2830,14 @@ class Application(Tk, Sender):
 
         # Update probe and draw point
         if self._probeUpdate:
-            Page.frames["Probe:Probe"].updateProbe()
-            Page.frames["ProbeCommon"].updateTlo()
+            try: 
+                Page.frames["Probe:Probe"].updateProbe()
+            except KeyError: 
+                pass 
+            try:
+                Page.frames["ProbeCommon"].updateTlo()
+            except KeyError:
+                pass
             self.canvas.drawProbe()
             self._probeUpdate = False
 
@@ -2799,7 +2846,10 @@ class Application(Tk, Sender):
             if self._update == "toolheight":
                 Page.frames["Probe:Tool"].updateTool()
             elif self._update == "TLO":
-                Page.frames["ProbeCommon"].updateTlo()
+                try:
+                    Page.frames["ProbeCommon"].updateTlo()
+                except KeyError:
+                    pass
             self._update = None
 
         if self.running:
